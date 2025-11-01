@@ -20,32 +20,45 @@ export const ArtTable = () => {
   const [rows, setRows] = useState<ArtRow[]>([]);
   const [selectedRows, setSelectedRows] = useState<ArtRow[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [numToSelect, setNumToSelect] = useState<number>(0);
 
   const op = useRef<OverlayPanel>(null);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(page);
+  }, [page]);
 
-  const loadData = async () => {
-    const data = await fetchArtworks(1, 50);
-    const mapped = data.data.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      place_of_origin: item.place_of_origin,
-      artist_display: item.artist_display,
-      inscriptions: item.inscriptions,
-      date_start: item.date_start,
-      date_end: item.date_end,
-    }));
-    setRows(mapped);
-    setTotalRecords(data.pagination.total);
+  const loadData = async (pageNum: number) => {
+    try {
+      setLoading(true);
+      const data = await fetchArtworks(pageNum, 8);
+      const mapped = data.data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        place_of_origin: item.place_of_origin,
+        artist_display: item.artist_display,
+        inscriptions: item.inscriptions,
+        date_start: item.date_start,
+        date_end: item.date_end,
+      }));
+      setRows(mapped);
+      setTotalRecords(data.pagination.total);
+    } catch (err) {
+      console.error("Failed to load data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onPageChange = (event: any) => {
+    const newPage = event.page + 1;
+    setPage(newPage);
   };
 
   const handleAutoSelect = () => {
     if (!numToSelect || numToSelect <= 0) return;
-
     const selectedSubset = rows.slice(0, numToSelect);
     setSelectedRows(selectedSubset);
     op.current?.hide();
@@ -56,7 +69,7 @@ export const ArtTable = () => {
       <Button
         type="button"
         icon="pi pi-angle-down"
-        className=" p-0 text-gray-700 hover:text-indigo-600"
+        className="p-0 text-gray-700 hover:text-indigo-600"
         onClick={(e) => op.current?.toggle(e)}
       />
       <OverlayPanel ref={op}>
@@ -70,7 +83,7 @@ export const ArtTable = () => {
             inputStyle={{ width: "100%" }}
           />
           <Button
-            label="submit"
+            label="Submit"
             onClick={handleAutoSelect}
             size="small"
             className="p-button-sm p-button-primary"
@@ -94,6 +107,9 @@ export const ArtTable = () => {
         paginator
         rows={8}
         totalRecords={totalRecords}
+        onPage={onPageChange}
+        loading={loading}
+        lazy
         rowsPerPageOptions={[8, 16, 32, 64]}
         tableStyle={{ minWidth: "60rem" }}
         selectionMode="checkbox"
