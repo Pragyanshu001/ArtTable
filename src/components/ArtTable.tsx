@@ -21,9 +21,10 @@ export const ArtTable = () => {
   const [selectedRows, setSelectedRows] = useState<ArtRow[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [first, setFirst] = useState(0);
   const [loading, setLoading] = useState(false);
   const [numToSelect, setNumToSelect] = useState<number>(0);
-
   const op = useRef<OverlayPanel>(null);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export const ArtTable = () => {
   const loadData = async (pageNum: number) => {
     try {
       setLoading(true);
-      const data = await fetchArtworks(pageNum, 8);
+      const data = await fetchArtworks(pageNum, rowsPerPage);
       const mapped = data.data.map((item: any) => ({
         id: item.id,
         title: item.title,
@@ -55,6 +56,8 @@ export const ArtTable = () => {
   const onPageChange = (event: any) => {
     const newPage = event.page + 1;
     setPage(newPage);
+    setRowsPerPage(event.rows);
+    setFirst(event.first);
   };
 
   const handleAutoSelect = () => {
@@ -105,11 +108,12 @@ export const ArtTable = () => {
       <DataTable
         value={rows}
         paginator
-        rows={8}
+        rows={rowsPerPage}
         totalRecords={totalRecords}
+        lazy
+        first={first}
         onPage={onPageChange}
         loading={loading}
-        lazy
         rowsPerPageOptions={[8, 16, 32, 64]}
         tableStyle={{ minWidth: "60rem" }}
         selectionMode="checkbox"
