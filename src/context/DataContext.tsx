@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, type ReactNode } from "react";
 
 type ArtRow = {
   id: number;
