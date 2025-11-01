@@ -1,4 +1,3 @@
-import React from "react";
 import { DataProvider } from "./context/DataContext";
 import { ArtTable } from "./components/ArtTable";
 import "primereact/resources/themes/lara-light-blue/theme.css";
