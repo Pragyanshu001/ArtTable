@@ -82,9 +82,7 @@ export const ArtTable = () => {
 
   return (
     <div className="card">
-      <h2 className="mb-3 text-lg font-semibold text-gray-700">
-        Artworks Table
-      </h2>
+      <h2 className="mb-3 text-lg font-semibold text-gray-700">Data Table</h2>
 
       <p className="mb-3 text-gray-500">
         Total Selected:{" "}
